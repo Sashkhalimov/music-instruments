@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from flask_sqlalchemy import SQLAlchemy
@@ -11,7 +11,7 @@ app.config['SECRET_KEY'] = 'test'
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
-admin = Admin(app, name='INSTRUMENTS', template_mode='bootstrap4')
+admin = Admin(app, name='INSTRUMENTS', template_mode='bootstrap3')
 
 class InstrumentType(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -35,7 +35,18 @@ class MusicInstrument(db.Model):
 admin.add_view(ModelView(MusicInstrument, db.session))
 admin.add_view(ModelView(InstrumentType, db.session))
 
+@app.route('/')
+def index():
+    a = InstrumentType.query.all()
+    return render_template('index.html', a=a)
 
-app.run()
+@app.route('/musicinstruments/')
+def listinst():
+    instruments = MusicInstrument.query.all()
+    return render_template('listinst.html', instruments=instruments)
+
+
+if __name__ == '__main__':
+    app.run()
 
 
